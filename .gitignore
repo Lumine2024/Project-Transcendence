@@ -1,0 +1,23 @@
+# IDE and OS
+.vs/
+.vscode/
+.idea/
+.DS_Store/
+
+# Python
+__pycache__
+
+# TypeScript
+node_modules
+dist
+build
+out
+lib
+esm
+cjs
+coverage
+*.tsbuildinfo
+*.log
+
+
+# Java
