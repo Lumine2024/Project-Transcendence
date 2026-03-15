@@ -1,0 +1,12 @@
+You can change properties of existing blocks:
+
+```js
+BlockEvents.modification(event => {
+  event.modify('minecraft:stone', block => {
+    block.destroySpeed = 0.1
+    block.hasCollision = false
+  })
+})
+```
+
+You can find [[$MutableBlock|full list of MutableBlock properties here]].

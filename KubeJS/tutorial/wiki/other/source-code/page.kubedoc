@@ -1,0 +1,270 @@
+# [![[banner.png|KubeJS]]](https://kubejs.com)
+
+## Introduction
+
+KubeJS is a Minecraft mod for NeoForge 1.21.1+ as well as Forge (1.14-1.20.1) and Fabric (1.16-1.20.1) which lets you create scripts in the JavaScript programming language to manage your server using events, change recipes, add ~~and edit~~ (coming soon!) loot tables, customise your world generation, add new blocks and items, or use custom integration with other mods like [FTB Quests](https://mods.latvian.dev/books/kubejs/page/ftb-quests-integration) for even more advanced features!
+
+## Issues and Feedback
+
+If you think you've found a bug with the mod or want to ask for a new feature, feel free to submit a ticket in our [Discord server](https://discord.gg/lat), we'll try to get on it as soon as we can! Alternatively, you can also [open an issue](https://github.com/KubeJS-Mods/KubeJS/issues) over on GitHub to discuss things with us.
+
+## License
+
+KubeJS is distributed under the GNU Lesser General Public License v3.0, or LGPLv3. See our [LICENSE](https://github.com/KubeJS-Mods/KubeJS/blob/main/LICENSE.txt) file for more information.
+
+## Creating an addon
+
+>>> info
+This section is primarily geared towards *mod developers* creating addons for KubeJS.
+If you are a script developer (pack dev, server admin, etc.) you may want to visit the other wiki pages instead.
+<<<
+
+Creating addon mods for KubeJS is easy! Just follow the following steps to your own liking, depending on how deep you want your integration to go!
+
+### Initial setup
+
+To add a Gradle dependency on KubeJS, you will need to add the following repositories to your `build.gradle`'s `repositories`:
+
+|> 1.21, and above
+```groovy
+repositories {
+    maven {
+        url "https://maven.latvian.dev/releases"
+        content {
+            includeGroup "dev.latvian.mods"
+            includeGroup "dev.latvian.apps"
+        }
+    }
+
+    maven {
+        url 'https://jitpack.io'
+        content {
+            includeGroup "com.github.rtyley"
+        }
+    }
+}
+```
+<||>+ 1.20.1 and below
+```groovy
+repositories {
+	maven {
+		// Shedaniel's maven (Architectury API)
+		url = "https://maven.architectury.dev"
+		content {
+			includeGroup "dev.architectury"
+		}
+	}
+
+	maven {
+		// latvian.dev Maven (KubeJS and Rhino)
+		url = "https://maven.latvian.dev/releases"
+		content {
+			includeGroup "dev.latvian.mods"
+		}
+	}
+}
+```
+<|
+
+You can then declare KubeJS as a regular `compile`-time dependency in your `dependencies` block:
+|> MDG / modern NG
+```groovy
+api("dev.latvian.mods:kubejs-neoforge:$kubejs_version") // alternatively use 'implementation'
+// optional, but often used in KubeJS, so we highly recommend adding this
+interfaceInjectionData("dev.latvian.mods:kubejs-neoforge:$kubejs_version") 
+```
+<||> (Fabric / Architectury) Loom
+```groovy
+// use "common", "fabric", or "forge"
+// transitive dependencies will be pulled in automatically
+modImplementation("dev.latvian.mods:kubejs-<loader>:$kubejs_version")
+```
+<||> ForgeGradle
+```groovy
+implementation fg.deobf("dev.latvian.mods:kubejs-forge:$kubejs_version")
+
+// these two are unfortunately needed since fg.deobf doesn't respect transitive dependencies
+implementation fg.deobf("dev.latvian.mods:rhino-forge:$rhino_version")
+implementation fg.deobf("dev.architectury:architectury-forge:$architectury_version")
+```
+
+### Fixing refmaps
+
+KubeJS uses the official mappings for Minecraft ("mojmap"). Since the refmap remapper for Mixins on ModLauncher doesn't support non-MCP mappings on older versions, you may need to add some extra lines to your runs to keep it from crashing, as detailed [here](https://github.com/SpongePowered/Mixin/issues/462#issuecomment-791370319) on the Mixin issue tracker. Be sure to regenerate your runs afterwards!
+
+```groovy
+minecraft {
+	runs {
+		client {
+			property 'mixin.env.remapRefMap', 'true'
+			property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+		}
+		// should be analogue for any other runs you have
+	}
+}
+```
+<|
+
+We only officially support ModDevGradle and NeoGradle on 1.21+, though if you are an Architectury project using Loom, the above should still work fine on modern versions!
+
+>>> warning
+A version listing page showing the newest versions of KubeJS is currently NYI, use the latest version from CurseForge or Modrinth where possible!
+<<<
+
+### Creating a plugin
+
+>>> warning
+This section is currently partially outdated, and needs to cover changes to plugins over multiple versions. WIP!
+<<<
+
+KubeJS [plugins](https://github.com/KubeJS-Mods/KubeJS/blob/main/src/main/java/dev/latvian/mods/kubejs/plugin/KubeJSPlugin.java) are the main way to add KubeJS integration to your mods through code. They contain various convenient hooks for addon developers, to allow things such as:
+
+- performing certain actions during or after plugin or KubeJS initialisation (`init`, `afterInit`, etc.)
+- adding classes to the class filter (`registerClasses`) as well as custom bindings (`registerBindings`) and type wrappers (`registerWrappers`) for easier interaction with native code in user scripts (See below for an explanation and example use cases)
+- registering custom recipe handlers for modded recipe types (`registerRecipeTypes` - See below for an example)
+- registering custom event handler groups for the KubeJS event system (`registerEvents`, this is **necessary** in order to have the event group be accessible from scripts)
+- attaching extra data to players, worlds or the server, such that it can be accessed by script developers later (`attach(Player|World|Server)Data` - [Example](https://github.com/FTBTeam/FTB-Quests/blob/11311be070273008483d4c734ff9b96cc6a85b02/common/src/main/java/dev/ftb/mods/ftbquests/integration/kubejs/KubeJSIntegration.java#L40-L43))
+
+### Adding recipe handlers
+
+>>> error
+This section is currently out of date and only applies to KubeJS in 1.19!
+<<<
+
+To add custom recipe handlers for your own modded recipe types, use KubeJS plugins as noted above. A concrete example of this can be found [here](https://github.com/KubeJS-Mods/KubeJS-Thermal/blob/1.19/main/src/main/java/dev/latvian/mods/kubejs/thermal/KubeJSThermalPlugin.java) for integration with the Thermal series, but we'll give you a simple outline of the process here as well:
+
+```java
+public class MyExamplePlugin extends KubeJSPlugin {
+	@Override
+	public void registerRecipeTypes(RegisterRecipeTypesEvent event) {
+		// for custom recipe types based on shaped recipes, like non-mirrored or copying NBT
+		event.registerShaped("mymod:shapedbutbetter");        // analogue: registerShapeless
+
+		// this is what you usually want to use for custom machine recipe types and the like
+		event.register("mymod:customtype", MyRecipeJS::new);
+	}
+}
+
+public class MyRecipeJS extends RecipeJS {
+	public OutputItem result; // represents a single output item stack, which may have a chance attached to it
+	public InputItem ingredient; // represents an input item ingredient or ingredient stack
+
+	// create is invoked when a recipe is created through script code,
+	// with args being the list of parameters passed to the recipe constructor
+	// if an args.get(i) call is out of bounds, it will return null instead, so
+	// you don't need to worry about checking for out of bounds
+	@Override
+	public void create(RecipeArguments args) {
+		result = parseOutputItem(args.get(0));
+		ingredient = parseInputItem(args.get(1));
+	}
+
+	// example of a custom property that can be set through scripts
+	// in this case, the experience property is saved to the recipe's JSON immediately,
+	// rather than storing it in a field and serializing it all at once later;
+	// this is recommended for "optional" properties that likely won't be supplied during `create`
+	public CookingRecipeJS xp(float xp) {
+		json.addProperty("experience", Math.max(0F, xp));
+		save();
+		return this;
+	}
+
+	// this is invoked when a recipe is loaded from JSON
+	// (mostly used for modifying existing recipes, since new recipes
+	// added by scripts are done through `create` instead)
+	@Override
+	public void deserialize() {
+		result = parseOutputItem(json.get("result"));
+		ingredient = parseInputItem(json.get("ingredient"));
+	}
+
+	// this is used both by modified and newly created recipes
+	// to serialize them to JSON; currently, it is *required*
+	// by default that your recipes are JSON-serializable,
+	// and while you may be able to get away with code-only recipes
+	// e.g. through overriding `createRecipe`, this is unsupported
+	// since the assumed use case is that all recipes have some JSON representation
+	@Override
+	public void serialize() {
+		if (serializeOutputs) {
+			json.add("result", outputToJson(result));
+		}
+
+		if (serializeInputs) {
+			json.add("ingredient", inputToJson(ingredient));
+		}
+	}
+
+	// the next two methods are used during bulk recipe modification
+	// (through RecipeFilter) to find recipes that contain a certain in- or output
+	@Override
+	public boolean hasInput(IngredientMatch match) {
+		return match.contains(ingredient);
+	}
+
+	@Override
+	public boolean hasOutput(IngredientMatch match) {
+		return match.contains(result);
+	}
+
+	// these two methods are used to replace a given in- or output item with another using the given transformer
+	@Override
+	public boolean replaceInput(IngredientMatch match, InputItem with, InputItemTransformer transformer) {
+		if (match.contains(ingredient)) {
+			ingredient = transformer.transform(this, match, ingredient, with);
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean replaceOutput(IngredientMatch match, OutputItem with, OutputItemTransformer transformer) {
+		if (match.contains(result)) {
+			result = transformer.transform(this, match, result, with);
+			return true;
+		}
+
+		return false;
+	}
+}
+```
+
+### Adding bindings
+
+Similarly to adding custom recipe types, you may also add **custom bindings** to KubeJS (refer to KubeJS' own [builtin plugin](https://github.com/KubeJS-Mods/KubeJS/blob/main/src/main/java/dev/latvian/mods/kubejs/plugin/builtin/BuiltinKubeJSPlugin.java) for an example). Bindings can be anything from single value constants (like the global `HOUR = 3600000 (ms)`) to Java class and method wrappers (such as the builtin `Item` binding, which is wrapping the `ItemWrapper` class), and can be constrained to individual scopes, contexts and script types, as well!
+
+### Setting class filters
+
+KubeJS offers native Java type access in script files, meaning that basic Java types can be referenced directly by using for example `Java.loadClass("package.class")`. While builtin filters exist to prevent users from accessing any internal or potentially harmful packages added by Minecraft or its libraries directly, you may still want to explicitly deny access to certain classes or packages in your mod (or explicitly allow certain classes *within* a generally blacklisted package). To do this, you may either provide a class filter using a KubeJS plugin *or* you can avoid adding KubeJS as a dependency entirely by providing a simple `kubejs.classfilter.txt` file in your mod's `resources` with the following format (Note that comments aren't allowed in the actual file):
+
+```diff
++mymod.api // This will *explicitly allow* anything from the mymod.api package to be used in KubeJS
+-mymod.api.MyModAPIImpl // This will deny access to the MyModAPIImpl class, while keeping the rest of the package accessible
+-mymod.internal.HttpUtil // This will *explicitly deny* your class from being used in KubeJS
+```
+
+## Contributing to KubeJS
+
+### Getting Started
+
+If you want to contribute to KubeJS, you will first need to set up a development environment, which should be fairly simple. Just clone the repository using Git:
+
+```sh
+git clone https://github.com/KubeJS-Mods/KubeJS.git
+```
+
+and import the gradle project using an IDE of your choice! (Note: Eclipse is likely to have problems with Architectury's runs, but IDEA and VS Code should work fine.)
+
+### Building
+
+Building KubeJS from source is rather straightforward, just run `gradlew build` in the root project and check the `build/libs` directory for a `kubejs-neoforge-<version>-local-<timestamp>.jar`. In older versions, Forge and Fabric-specific jars can be found in the respective module's `build/libs` directory. The project will also produce a common jar in these versions; that one however should not be used in production.
+
+### Creating Pull Requests
+
+When creating a pull request to KubeJS, please make sure you acknowledge the following:
+
+- We will *usually* not accept pull requests that add mod-specific support; those things are better suited as KubeJS plugins (optimally within the target mods themselves) or integration mods.
+- Please be sure to test your feature **before** creating a pull request. We are a rather small team and as such, can't spend all too much time on reviewing pull requests.
+- While not *strictly* required, please try to adhere by the repository's code style and conventions. A sample `.editorconfig` file exists to make this even easier for you to achieve (see the relevant EditorConfig plugin for your IDE)
+- If you are unsure whether your feature fits into KubeJS and would like to hear additional opinions on the matter, feel free to open an `issue` or a `discussion` to discuss it further with us first!

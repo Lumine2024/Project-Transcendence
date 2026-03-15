@@ -1,0 +1,99 @@
+You can change properties of existing items:
+
+```js
+ItemEvents.modification(event => {
+  event.modify('minecraft:ender_pearl', item => {
+    item.maxStackSize = 64
+    item.fireResistant = true
+    item.rarity = 'UNCOMMON'
+  })
+
+  event.modify('minecraft:ancient_debris', item => {
+    item.rarity = 'RARE'
+    item.burnTime = 16000
+  })
+
+  event.modify('minecraft:turtle_helmet', item => {
+    item.rarity = 'EPIC'
+    item.maxDamage = 481
+    item.craftingRemainder = Item.of('minecraft:scute').item
+  })
+})
+```
+
+You can find [[$MutableItem|full list of MutableItem properties here]].
+
+# Tool Defaults
+| Tier | `level` | `maxDamage` | `digSpeed` | `attackDamage` | `enchantmentValue` |
+| Wood | 0 | 59 | 2 | 0 | 15 |
+| Stone | 1 | 131 | 4 | 1 | 5 |
+| Iron | 2 | 250 | 6 | 2 | 14 |
+| Diamond | 3 | 1561 | 8 | 3 | 10 |
+| Gold | 0 | 32 | 12 | 0 | 22 |
+| Netherite | 4 | 2031 | 9 | 4 | 15 |
+>>> info
+`attackDamage` is a bonus modified by the tool type value, not the final value
+<<<
+
+# Armor Defaults
+All boxes with multiple values are formatted `head | chest | legs | feet`.
+
+| Tier |[merge=4] `maxDamage` |[merge=4] `armorProtection` | `armorToughness` | `armorKnockbackResistance` |
+| Leather | 65 | 75 | 80 | 55 | 1 | 2 | 3 | 1 | 0 | 0 |
+| Chain | 95 | 225 | 240 | 165 | 1 | 4 | 5 | 2 | 0 | 0 |
+| Iron | 195 | 225 | 240 | 165 | 2 | 5 | 6 | 2 | 0 | 0 |
+| Gold | 91 | 105 | 112 | 77 | 1 | 3 | 5 | 2 | 0 | 0 |
+| Diamond | 429 | 495 | 528 | 363 | 3 | 6 | 8 | 3 | 2 | 0 |
+| Turtle | 325 | - | - | - | 2 | - | - | - | 0 | 0 |
+| Netherite | 481 | 555 | 592 | 407 | 3 | 6 | 8 | 3 | 3 | 0.1 |
+| Elytra | - | 432 | - | - | - | 0 | - | - | 0 | 0 |
+Turtle only has helmet slot and Elytra only has chestplate slot.
+
+# Tier
+>>> danger
+[Broken at the moment!](https://github.com/KubeJS-Mods/KubeJS/issues/662) Use the non tier methods instead.
+<<<
+
+## Tools
+```js
+ItemEvents.modification(event => {
+  event.modify('minecraft:golden_sword', item => {
+    item.tier = tier => {
+        tier.speed = 12
+        tier.attackDamageBonus = 10
+        tier.repairIngredient = '#forge:storage_blocks/gold'
+        tier.level = 3
+    }
+  })
+
+  event.modify('minecraft:wooden_sword', item => {
+    item.tier = tier => {
+        tier.enchantmentValue = 30
+    }
+  })
+})
+```
+You can find [[$MutableToolTier|full list of MutableToolTier properties here]].
+
+## Armor
+Doesnt actually exist/work at the moment. Sorry.
+
+# Food
+```js
+ItemEvents.modification(event => {
+  event.modify('minecraft:diamond', item => {
+    item.foodProperties = food => {
+        food.hunger(2)
+        food.saturation(3)
+        food.fastToEat()
+        food.eaten(foodData => foodData.player.tell('you ate')) // this is broken, use ItemEvents.foodEaten instead.
+    }
+  })
+
+  event.modify('minecraft:pumpkin_pie', item => {
+    item.foodProperties = null // make pumpkin pies inedible
+  })
+})
+```
+
+You can find [[$FoodBuilder|full list of FoodBuilder methods here]].

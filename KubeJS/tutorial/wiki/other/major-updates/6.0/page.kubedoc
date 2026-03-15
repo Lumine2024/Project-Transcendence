@@ -1,0 +1,117 @@
+# onEvent()
+
+`[js]onEvent('event', event => {})` syntax was replaced by `[js]SomeEventGroup.someEventName(event => {})`
+
+|> New
+```js
+BlockEvents.rightClicked(event => {
+  if(event.block.id === 'minecraft:dirt') {
+    console.info('Hi!')
+  }
+})
+```
+<||> Old
+```js
+onEvent('block.right_click', event => {
+  if(event.block.id === 'minecraft:dirt') {
+    console.info('Hi!')
+  }
+})
+```
+<|
+
+Not only that, but new events also support extra parameters for IDs and other things! You can now choose to make each id have its own event handler:
+
+|> New
+```js
+BlockEvents.rightClicked('minecraft:dirt', event => {
+  console.info('Hi!')
+})
+
+BlockEvents.rightClicked('minecraft:stone', event => {
+  console.info('Bye!')
+})
+```
+<||> Old
+```js
+onEvent('block.right_click', event => {
+  if(event.block.id === 'minecraft:dirt') {
+    console.info('Hi!')
+  } else if(event.block.id === 'minecraft:stone') {
+    console.info('Bye!')
+  }
+})
+```
+<|
+
+Some events *require* ID, such as registry and tag events:
+
+|> New
+```js
+StartupEvents.registry('item', event => {})
+```
+<||> Old
+```js
+onEvent('item.registry', event => {})
+```
+<|
+
+|> New
+```js
+ServerEvents.tags('item', event => {})
+```
+<||> Old
+```js
+onEvent('tags.items', event => {})
+```
+<|
+
+Using parameters is actually faster on the CPU than checking some `[js]event.id == 'id'`
+
+>>> info
+You can find the full list of new events [[/events|here]].
+<<<
+
+# onForgeEvent()
+
+`[js]onForgeEvent('package.ClassName', event => {})` has been replaced by `[js]ForgeEvents.onEvent('package.ClassName', event => {})`
+
+|> New
+```js
+ForgeEvents.onEvent('net.minecraftforge.event.level.BlockEvent$PortalSpawnEvent', event => {})
+```
+<||> Old
+```js
+onForgeEvent('net.minecraftforge.event.level.BlockEvent$PortalSpawnEvent', event => {})
+```
+<|
+
+New! It now supports generic events:
+
+```js
+ForgeEvents.onGenericEvent('net.minecraftforge.event.AttachCapabilitiesEvent', 'net.minecraft.world.entity.Entity', event => {})
+```
+
+# Server settings
+
+`settings.log...` properties have been removed from server scripts, and instead, moved to `local/kubejsdev.properties` file. By default, it won't be shipped with the pack, but you can change `saveDevPropertiesInConfig` to true to instead save the file in `kubejs/config/dev.properties`.
+
+# java()
+
+`[js]java('package.ClassName')` has been replaced by `[js]Java.loadClass('package.ClassName')`
+
+|> New
+```js
+const CactusBlock = Java.loadClass('net.minecraft.world.level.block.CactusBlock')
+```
+<||> Old
+```js
+const CactusBlock = java('net.minecraft.world.level.block.CactusBlock')
+```
+<|
+
+There might be some more reflective helper methods later in the Java util class, such as listing all fields and methods in a class, etc.
+
+# Bye Bye Wrapper classes
+
+None of the vanilla classes are wrappers anymore - `EntityJS`, `LevelJS`, `ItemStackJS`, `IngredientJS`, and others are gone. This may introduce some bugs, but in general, should make it significantly easier to interact with Minecraft and other mods. Almost all old methods are still supported by core-modding vanilla. This should also significantly boost performance, as it doesn't need to constantly wrap and unwrap classes.
