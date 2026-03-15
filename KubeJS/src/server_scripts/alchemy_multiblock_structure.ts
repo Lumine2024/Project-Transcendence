@@ -11,5 +11,5 @@ export namespace AlchemyMultiblock {
         "projecte:red_matter_block"
     ];
     export const centerBlock: Internal.Block_ = "minecraft:water";
-    export const controllerStoreKey = "dm_pedestal_key"
+    export const controllerStoreKey = "dm_pedestal_key";
 }
