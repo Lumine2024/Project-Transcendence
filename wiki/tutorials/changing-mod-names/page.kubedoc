@@ -1,0 +1,17 @@
+>>> info
+{version-info}
+<<<
+
+{startup-line}
+
+```js
+Platform.mods.kubejs.name = 'My Modpack Name'
+```
+
+{useful}
+
+{other-mods}
+
+```js
+Platform.mods.botania.name = 'Plant Tech Mod'
+```

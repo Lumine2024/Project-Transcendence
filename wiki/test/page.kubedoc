@@ -1,0 +1,305 @@
+>>> danger
+Don't forget to `Ctrl + F5` to make sure you have the latest CSS files!
+<<<
+
+---
+
+# Heading 1
+## Heading 2
+### Heading 3
+
+---
+
+# Heading 1
+Text
+## Heading 2
+Text
+### Heading 3
+Text
+
+### Heading [with link and *italic text*](https://kubejs.com/)
+Text
+
+---
+
+**Bold**
+*Italic*
+~~Strikethrough~~
+__Underline__
+`Code`
+==Highlight==
+===Error Highlight===
+***~~__==`Everything`==__~~***
+{description} - Language key
+[Test Link](https://kubejs.com/)
+Page Link [[/test]]
+Page Link [[/fake-page]]
+Page Link - [[/test|See this page]]
+![[test.png|Test Image]]
+
+Inline `code` and `code II` and `code *III*`
+
+**`Bold Code`**
+`**Bold Code**`
+
+**Bold** Regular **Bold**
+
+**Bold \*\*Escaped**
+
+{missing-key-test}
+
+![[test.png|L Image]]![[test.png|R Image]]
+
+![[test.png|L Image]] Text ![[test.png|R Image]]
+
+#[[red|Red]] text, #[[orange|Orange]] text, #[[yellow|Yellow]] text, #[[green|Green]] text, #[[blue|Blue]] text, #[[purple|Purple]] text, #[[magenta|Magenta]] text
+
+#[[red|Red and **bold**]]
+
+Inline image ![[emoji:test.png|Test]] test [[@000001]]
+
+[[[/tutorials/block-registry]]]
+[[[/ref/BlockBuilder]]]
+[[[/fake-page]]]
+
+---
+
+Emoji test:
+{no} {yes} {thumbs-up} {thumbs-down} {point-up} {wink} {na}
+
+Script types:
+{st-s}, {se-s}, {cl-s}
+
+---
+
+```js
+const code = 'JavaScript code test'
+console.log('Hello, World!')
+```
+
+```js
+// this code uses space indents
+ServerEvents.recipes(event => {
+  const potting = (output, pottedInput) => {
+    event.shaped(output, [
+      'BIB',
+      ' B '
+    ], {
+      B: 'minecraft:brick',
+      I: pottedInput
+    })
+  }
+
+  //Now we can make many 'potting' recipes without typing that huge block over and over!
+  potting('kubejs:potted_snowball', 'minecraft:snowball')
+  potting('kubejs:potted_lava', 'minecraft:lava_bucket')
+  potting('minecraft:blast_furnace', 'minecraft:furnace')
+})
+```
+
+```js
+// and this uses tab indents
+ServerEvents.recipes(event => {
+	const potting = (output, pottedInput) => {
+		event.shaped(output, [
+			'BIB',
+			' B '
+		], {
+			B: 'minecraft:brick',
+			I: pottedInput
+		})
+	}
+
+	//Now we can make many 'potting' recipes without typing that huge block over and over!
+	potting('kubejs:potted_snowball', 'minecraft:snowball')
+	potting('kubejs:potted_lava', 'minecraft:lava_bucket')
+	potting('minecraft:blast_furnace', 'minecraft:furnace')
+})
+```
+
+---
+
+>>>
+Quote callout
+![[quote.png|This is where I would write something profound, but uh.. Nope. Nothing comes to mind.]]
+<<<
+
+>>> info
+Info callout
+![[test.png]]
+<<<
+
+>>> warn
+Warning callout
+<<<
+
+>>> danger
+Danger callout
+<<<
+
+>>> success
+Success callout
+<<<
+
+---
+
+- Item 1
+- Item 2
+- Item 3
+  - Sub-Item 1
+  - Sub-Item 2
+  - Sub-Item 3
+
+. Item 1
+. Item 2
+. Item 3
+  . Sub-Item 1
+  . Sub-Item 2
+  . Sub-Item 3
+
+. Item 1
+. Item 2
+. Item 3
+  - Sub-Item 1
+  - Sub-Item 2
+  - Sub-Item 3
+. Item 4
+  - Sub-Item 1
+  - Sub-Item 2
+    - Sub-Item 1
+    - Sub-Item 2
+
+- Single item
+
+. Single item
+
+- ### Heading item 1
+- ### Heading item 2
+- ### Heading item 3
+
+- List with tabs
+	- Item 1
+	- Item 2
+		- Item 1
+		- Item 2
+
+- List with weird spaces
+     - Item 1
+     - Item 2
+          - Item 1
+          - Item 2
+
+---
+
+>>> info
+- Item in callout 1
+- Item in callout 2
+<<<
+
+---
+
+|> Dropdown List
+Item 1
+Item 2
+- Some list item
+- Another list item
+<|
+
+|>+ Dropdown List (Open by default)
+Item 1
+Item 2
+- Some list item
+- Another list item
+|> Nested dropdown list
+Don't watch this video!
+![[youtube:YAAHW7AZx48]]
+<|
+<|
+
+---
+
+|> Tab I
+Nothing to see here.
+<||>+ Tab II
+☃️
+![[youtube:7HNuh_KCHM0|It's water.]]
+<|
+
+---
+
+# Recipe Example
+
+|> 1.19.2+
+```js
+ServerEvents.recipes(event => {
+  event.shaped(
+    Item.of('minecraft:stone', 3), // arg 1: output
+    [
+      'A B',
+      ' C ', // arg 2: the shape (array of strings)
+      'B A'
+    ],
+    {
+      A: 'minecraft:andesite',
+      B: 'minecraft:diorite',  //arg 3: the mapping object
+      C: 'minecraft:granite'
+    }
+  )
+})
+```
+<||> 1.18.2
+```js
+onEvent('recipes', event => {
+  event.shaped(
+    Item.of('minecraft:stone', 3), // arg 1: output
+    [
+      'A B',
+      ' C ', // arg 2: the shape (array of strings)
+      'B A'
+    ],
+    {
+      A: 'minecraft:andesite',
+      B: 'minecraft:diorite',  //arg 3: the mapping object
+      C: 'minecraft:granite'
+    }
+  )
+})
+```
+<|
+
+---
+
+### Language tests
+
+Šaursliežu Dzelsceļš
+生活就像海洋，只有意志坚强的人才能到达彼岸
+
+---
+
+>>> #test
+Referenced, multi-line content:
+![[test.png|**test** alt text, image from {cl-s}]]
+Bottom text
+<<<
+
+- List item 1
+- List item 2, <#test>
+- List item 3
+
+# Methods
+
+## $$.texture(side: Direction, texture?: ID, test: int)
+Inline test $$.property inline test $$.method(test: int) inline test.
+
+# Tables
+
+---
+
+| Header 1 | Header 2 |
+| Cell 1 | Cell 2 |
+| Cell 3 | Cell 4 |
+
+| Header 1 | Header 2 |
+| Cell 1 | # Cell 2 |
+| [[/tutorials/block-registry]] | <#test> |
+| **Cell 5** | $$.methodInCell(test:int): String |

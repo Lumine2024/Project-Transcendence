@@ -1,0 +1,47 @@
+You can register many types of custom blocks in KubeJS. Here's the simplest way:
+
+```js
+StartupEvents.registry('block', event => {
+  event.create('example_block') // Create a new block with ID 'kubejs:example_block'
+})
+```
+
+That's it! Launch the game, and assuming you've left KubeJS' auto-generated resources alone, there should be a fully-textured block in the Creative menu under KubeJS (purple dye). KubeJS will also generate the name "Example Block" for you.
+
+To make modifications to this block, we use the [[$BlockBuilder|block builder]] returned by the `[js]event.create()` call. The block builder allows us to chain together multiple modifications. Let's try making some of the more common modifications:
+
+```js
+StartupEvents.registry('block', event => {
+  event.create('example_block') // Create a new block
+    .displayName('My Custom Block') // Set a custom name
+    .soundType('wool') // Set a material (affects the sounds and some properties)
+    .hardness(1) // Set hardness (affects mining time)
+    .resistance(1) // Set resistance (to explosions, etc)
+    .tagBlock('my_custom_tag') // Tag the block with `#minecraft:my_custom_tag` (can have multiple tags)
+    .requiresTool(true) // Requires a tool or it won't drop (see tags below)
+    .tagBlock('my_namespace:my_other_tag') // Tag the block with `#my_namespace:my_other_tag`
+    .tagBlock('minecraft:mineable/axe') //can be mined faster with an axe
+    .tagBlock('minecraft:mineable/pickaxe') // or a pickaxe
+    .tagBlock('minecraft:needs_iron_tool') // the tool tier must be at least iron
+})
+```
+
+# All Block Builder Methods
+The example above only covers a few of the methods available on the block builder.
+See the [[$BlockBuilder|full list here]]!
+
+# Alternate Block Builders
+Besides the base block builder, there are a few additional block builders avaialable which generally all inherit all the base methods from the base builder. Using `[js]event.create(name, key)`, you can use one of these alternate builders.
+| Key | Example | Note |
+| `basic` | Any block | This is the default |
+| `slab` | Oak Slab |  |
+| `stairs` | Oak Stairs |  |
+| `fence` | Oak Fence |  |
+| `fence_gate` | Oak Fence Gate |  |
+| `pressure_plate` | Oak Pressure Plate |  |
+| `wall` | Cobblestone Wall |  |
+| `button` | Oak Button |  |
+| `falling` | Sand |  |
+| `crop` | Wheat | Additional methods include `[js].survive()`, `[js].crop()` and `[js].growTick()`; `[js].item()` refers to the seed item for this crop |
+| `cardinal` | - |  |
+| `detector` | - |  |
