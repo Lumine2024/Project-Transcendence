@@ -1,0 +1,5 @@
+{
+  "name": "probejs",
+  "private": true,
+  "types": "index.d.ts"
+}

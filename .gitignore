@@ -19,5 +19,11 @@ coverage
 *.tsbuildinfo
 *.log
 
+probe
 
 # Java
+
+
+# Output file(please reference to Release files)
+*.snbt
+*.jar

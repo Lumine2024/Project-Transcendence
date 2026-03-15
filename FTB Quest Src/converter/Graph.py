@@ -7,15 +7,23 @@ class BaseType:
         raise NotImplementedError()
 
 class ItemType(BaseType):
-    __slots__ = ["item", "amount"]
-    def __init__(self, item: str, amount: int):
+    __slots__ = ["item", "amount", "tag"]
+    def __init__(self, item: str, amount: int, tag: slib.Compound | None = None):
         self.item = item
         self.amount = amount
+        self.tag = tag
     def encode_slib_compound(self) -> slib.Compound:
         result = slib.Compound()
         result["type"] = slib.String("item")
-        result["item"] = slib.String(self.item)
-        result["count"] = slib.Integer(self.amount)
+        if self.tag is None:
+            result["item"] = slib.String(self.item)
+            result["count"] = slib.Integer(self.amount)
+        else:
+            reitem = slib.Compound()
+            reitem["Count"] = slib.Integer(self.amount)
+            reitem["id"] = slib.String(self.item)
+            reitem["tag"] = self.tag
+            result["item"] = reitem
         return result
 
 class ExperimentType(BaseType):

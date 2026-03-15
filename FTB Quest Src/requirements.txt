@@ -1,3 +1,2 @@
 ftb_snbt_lib
 graphviz
-networkx

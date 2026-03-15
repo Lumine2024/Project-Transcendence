@@ -1,12 +1,12 @@
 from .Graph import *
 import ftb_snbt_lib as slib
 from graphviz import Digraph
-import networkx as nx
 from collections import deque
 
 __all__ = ["convert"]
 
-g_id = 0
+# generate from 0 may result in errors, so from a magic number
+g_id = 1145141919810
 def generate_id() -> int:
     global g_id
     result = g_id
@@ -14,19 +14,15 @@ def generate_id() -> int:
     return result
 
 def auto_layout(graph: Graph) -> list[tuple[float, float]]:
-    graph_nx = nx.DiGraph()
-    for i in range(len(graph.nodes)):
-        graph_nx.add_node(i)
-    for edge in graph.edges:
-        graph_nx.add_edge(edge.frm, edge.to)
     dot = Digraph(engine="dot")
     dot.attr(splines="line", rankdir="TB", nodesep="0.5", ranksep="0.75")
-    for node in graph_nx.nodes():
-        dot.node(str(node))
-    for frm, to in graph_nx.edges():
+    for i in range(len(graph.nodes)):
+        dot.node(str(i))
+    unique_edges = {(edge.frm, edge.to) for edge in graph.edges}
+    for frm, to in unique_edges:
         dot.edge(str(frm), str(to))
     plain = dot.pipe(format="plain").decode("utf-8")
-    result: list[tuple[float, float]] = [(0.0, 0.0) for _ in range(len(graph.nodes))]
+    result = [(0.0, 0.0) for _ in range(len(graph.nodes))]
     for line in plain.splitlines():
         parts = line.split()
         if len(parts) >= 4 and parts[0] == "node":
